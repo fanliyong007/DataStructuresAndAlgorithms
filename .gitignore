@@ -1,11 +1,9 @@
 #  Ignore everything
-*
-
-# Except tex files
-
-!.gitignore
-!*.tex
-!*.pdf
+build/
+dsacpp_src_vs2015/
+#  don't Ignore everything
+!*.h
 !*.cpp
 !*.c
-!*.md
+!*.hpp
+!MyDSA/
