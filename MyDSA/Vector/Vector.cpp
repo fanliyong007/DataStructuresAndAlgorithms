@@ -48,6 +48,7 @@ void Vector<T>::swap(T &A,T &B)//交换操作
     A=B;
     B=tmp;
 }
+//-------------------------------------------------public--------------------------------------------------------
 template <typename T>
 Vector<T>::Vector(int c=DEFAULT_CAPACITY,int s=0,T v=0)//容量为c、规模为s、所有元素初始化为v
 {
@@ -110,13 +111,6 @@ Vector<T>& Vector<T>::operator=(Vector<T> const&)//重载=符号
     return *this;//返回当前对象的引用，方便链式赋值 
 }
 template <typename T>
-T Vector<T>::remove(Rank r);//删除秩为r的元素
-{
-    T e=_elem[r];//备份删除元素
-    remove(r,r+1);//调用区间删除算法等效于对区间删除
-    return e;//返回被删除元素
-}
-template <typename T>
 int Vector<T>::remove(Rank lo,Rank hi)//删除区间内元素
 {
     if(lo==hi)
@@ -130,6 +124,13 @@ int Vector<T>::remove(Rank lo,Rank hi)//删除区间内元素
     _size=lo;//更新规模，直接丢弃尾部[lo,_size=hi)区间
     shrink();//若有必要，则缩容
     return hi-lo;//返回被删除元素的数目
+}
+template <typename T>
+T Vector<T>::remove(Rank r);//删除秩为r的元素
+{
+    T e=_elem[r];//备份删除元素
+    remove(r,r+1);//调用区间删除算法等效于对区间删除
+    return e;//返回被删除元素
 }
 template <typename T>
 Rank Vector<T>::insert(Rank r,T const& e)//插入元素
@@ -167,3 +168,9 @@ void Vector<T>::unsort()//整体乱序
 {
     unsort(0,_size);
 }
+template <typename T>
+int Vector<T>::deduplicate()//无序去重
+{
+    int oldSize=_size
+}
+
