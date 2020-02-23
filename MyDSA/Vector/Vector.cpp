@@ -41,6 +41,24 @@ void Vector<T>::shrink()//装填因子过小时压缩空间
     }
     delete [] oldElem;//释放空间
 }
+template <typename T> //向量的起泡排序（基本版）
+void Vector<T>::bubbleSort( Rank lo, Rank hi ) { //assert: 0 <= lo < hi <= size
+   while( lo < --hi ) //反复起泡扫描
+      for( Rank i = lo; i < hi; i++ ) //逐个检查相邻元素
+         if( _elem[i] > _elem[i + 1] ) //若逆序，则
+            swap( _elem[i], _elem[i + 1] ); //经交换使局部有序
+    //向量的起泡排序（提前终止版）
+    // for( bool sorted = false; sorted = !sorted; )
+    //   for( Rank i = lo; i < hi - 1; i++ )
+    //      if( _elem[i] > _elem[i + 1] ) //若逆序，则
+    //         swap( _elem[i], _elem[i + 1] ), sorted = false;
+    //         //经交换使局部有序——当然，至此还不能确定已整体有序 
+     //向量的起泡排序（跳跃版）       
+    // for( Rank last = --hi; lo < hi; hi = last )
+    //   for( Rank i = last = lo; i < hi; i++ )
+    //      if( _elem[i] > _elem[i + 1] ) //若逆序，则
+    //         swap( _elem[ last = i ], _elem[ i + 1 ] ); //经交换使局部有序
+}
 template <typename T>
 void Vector<T>::swap(T &A,T &B)//交换操作
 {
@@ -48,6 +66,48 @@ void Vector<T>::swap(T &A,T &B)//交换操作
     A=B;
     B=tmp;
 }
+template <typename T>
+void Vector<T>::merge(Rank lo,Rank hi)//归并算法
+{
+    T* A=_elem+lo;//合并后的向量A[0,hi-lo)=_elem[lo,hi)
+    Rank lb=mi-lo;//前子向量B[0,lb)=_elem[lo,mi]
+    T* B=new T[lb];
+    for(Rank i=0;i<lb;B[i]=A[i++]);//复制前子向量B
+    Rank lc=hi-mi;//后子向量C[0,lc)=_elem[mi,hi)
+    T* C=_elem+mi;
+    for(Rank i=0,j=0,k=0;(j<lb)||(k<lc);)//B[j]和C[k]中小者转至A的末尾
+    {
+        if((j<lb)&&(lc<=k||(B[j]<=C[k])))
+        {
+            A[i++]=B[i++];//C[k]已无或不小
+        }
+        if((k<lc)&&(lb<=j||(C[k]<B[j])))
+        {
+            A[i++]=C[k++];//B[j]已无或更大
+        }
+    }
+    delete [] B;//释放临时空间B
+}
+template <typename T>
+void Vector<T>::mergeSort(Rank lo,Rank hi)//归并排序算法
+{
+    if(hi-lo<2)
+        return;//单元素区间自然有序
+    Rank mi=(hi+lo)/2;
+    mergeSort(lo,mi);//归并排序前一部分
+    mergeSort(mi,hi);//归并排序后一部分
+    merge(lo,mi,hi);//归并
+}
+template <typename T>
+Rank Vector<T>::max(Rank lo,Rank hi){}//选取最大元素
+template <typename T>
+void Vector<T>::selectionSort(Rank lo,Rank hi){}//选择排序
+template <typename T>
+Rank Vector<T>::partition(Rank lo,Rank hi){}//轴点构造算法
+template <typename T>
+void Vector<T>::quickSort(Rank lo,Rank hi){}//快速排序算法
+template <typename T>
+void Vector<T>::heapSort(Rank lo,Rank hi){}//堆排序算法
 //-------------------------------------------------public--------------------------------------------------------
 template <typename T>
 Vector<T>::Vector(int c=DEFAULT_CAPACITY,int s=0,T v=0)//容量为c、规模为s、所有元素初始化为v
@@ -89,6 +149,52 @@ template <typename T>
 Rank Vector<T>::find(T const& e) const//无序向量整体查找
 {
     return find(e,0,_size);
+}
+template <typename T>
+Rank Vector<T>::fibSearch(T* A,T const& e,Rank lo,Rank hi)//Fibonacci查找算法
+{
+    Fib fib(hi-lo);
+    while(lo<hi)
+    {
+        while(hi-lo<fib.get())fib.prev();
+        Rank mi=lo+fib.get()-1;
+        if(e<A[mi])hi=mi;
+        else if(A[mi]<e)lo=mi+1;
+        else return mi;
+    }
+    return -1;
+}
+template <typename T>
+Rank Vector<T>::binSearch(T* A,T const& e,Rank lo,Rank hi)//二分查找
+{
+    //版本A
+    // while(lo<hi)
+    // {
+    //     Rank mi=(lo+hi)>>1;
+    //     if(e<A[mi])hi=mi;
+    //     else if(A[mi]>e)lo=mi+1;
+    //     else return mi;
+    // }
+    // return -1;
+    //版本B
+    // while(1<hi-lo)
+    // {
+    //     Rank mi=(lo+hi)>>1;
+    //     (e<A[mi])?hi=mi:lo=mi;
+    // }
+    // return (e==A[lo])?lo:-1;
+    //版本C
+    while(1<hi-lo)
+    {
+        Rank mi=(lo+hi)>>1;
+        (e<A[mi])?mi=lo:mi=hi;
+    }
+    return e==A[lo]?lo:-1;
+}
+template <typename T>
+Rank Vector<T>::search(T const& e,Rank lo,Rank hi) const//有序向量区间查找
+{
+    return(std::rand()%2)?binSearch(_elem,e,lo,hi):fibSearch(_elem,e,lo,hi);
 }
 template <typename T>
 Rank Vector<T>::search(T const& e) const//有序向量整体查找
@@ -150,6 +256,20 @@ Rank Vector<T>::insert(T const& e)//在末尾插入元素
     return insert(_size,e);
 }
 template <typename T>
+void Vector<T>::sort(Rank lo,Rank hi)//区间排序
+{
+    switch (rand()%3)
+    {
+    case 1:
+        mergeSort(lo,hi);
+        break;
+    case 2:
+        bubbleSort(lo,hi);
+        break;
+    //default:quickSort(lo,hi);break;
+    }
+}
+template <typename T>
 void Vector<T>::sort()//整体排序
 {
     sort(0,_size);
@@ -160,7 +280,7 @@ void Vector<T>::unsort(Rank lo,Rank hi)//区间乱序
     T* V=_elem+lo;//将子向量_elem[ko,hi)视作另一向量V[0,hi-lo)
     for(Rank i=hi-lo;i>0;i--)//自后向前
     {
-        swap(V[i-1],V[rand()%i]);//将V[i-1]与V[0,i)中某一元素随机交换
+        swap(V[i-1],V[std::rand()%i]);//将V[i-1]与V[0,i)中某一元素随机交换
     }
 }
 template <typename T>
@@ -171,6 +291,67 @@ void Vector<T>::unsort()//整体乱序
 template <typename T>
 int Vector<T>::deduplicate()//无序去重
 {
-    int oldSize=_size
+    int oldSize=_size;//纪录原始规模
+    Rank i=1;//从_elem[1]开始
+    while(i<_size)//自前向后逐一考察各元素_elem[i]
+    {
+        (find(_elem[i],0,i)<0)?//在其前缀中寻找与之雷同者（至少一个）
+        i++:remove(i);//若无雷同则继续考查其后继，否则删除雷同者
+    }
+    return oldSize-_size;//向量规模变化量，即被删除元素总数
 }
-
+template <typename T>
+void Vector<T>::traverse(void (*visit) (T&))//遍历（使用函数指针，只读或局部性修改）
+{
+    for(int i=0;i<_size;i++)
+    {
+        visit(_elem[i];)// 遍历向量
+    }
+}
+template <typename VST>
+void Vector<T>::traverse(VST& visit)//遍历（使用函数对象，可全局性修改）
+{
+    for(int i=0;i<_size;i++)
+    {
+        visit(_elem[i];)// 遍历向量
+    }
+}
+template <typename T>
+int Vector<T>::disorded() const//判断向量是否已排序
+{
+    int n=0;
+    for(int i=1;i<_size;i++)
+    {
+        if(_elem[i-1]>_elem[i])
+        {
+            n++;
+        }
+    }
+    return n;
+}
+/*template <typename T>
+int Vector<T>::uniquify()//有序去重(低效版)
+{
+    int oldSize=_size;
+    int i=1;
+    while(i<_size)
+    {
+        _elem[i-1]==_elem[i]?remove(i):i++;
+    }
+    return oldSize-_size;
+}*/
+template <typename T>
+int Vector<T>::uniquify()//有序去重(高效版)
+{
+    Rank i=0,j=0;//各对互异“相邻”元素的秩
+    while(++j<_size)//逐一扫描，直至末元素
+    {
+        if(_elem[i]!=_elem[j])//跳过雷同者
+        {
+            _elem[++i]=_elem[j];//发现不同元素时，向前移至紧邻于前右侧
+        }
+    }
+    _size=++i;
+    shrink();//直接截除尾部多余元素
+    return j-i;//向量规模变化量，即被删除元素总数
+}

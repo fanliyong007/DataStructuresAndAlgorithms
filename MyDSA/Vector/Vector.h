@@ -2,6 +2,14 @@
 // #include <cstdlib>
 #ifndef _VECTOR_H
 #define _VECTOR_H
+#ifndef _INCLUDE_RAND
+#define _INCLUDE_RAND
+#include <cstdlib>
+#endif
+#ifndef _INCLUDE_FIB
+#define _INCLUDE_FIB
+#include "../fibonacci/Fib.h"
+#endif
 #define DEFAULT_CAPACITY 3
 typedef int Rank;
 
@@ -16,8 +24,6 @@ protected:
     void expand();//扩容函数，用于空间不足时使用
     void shrink();//装填因子过小时压缩空间
     void swap(T &A,T &B);//交换操作
-    void bubble(Rank lo,Rank hi);//扫描交换
-    bool bubbleSore(Rank lo,Rank hi);//起泡排序
     Rank max(Rank lo,Rank hi);//选取最大元素
     void selectionSort(Rank lo,Rank hi);//选择排序
     void merge(Rank lo,Rank hi);//归并算法
@@ -30,13 +36,15 @@ public:
     Vector(T const* A,Rank n);//数组整体复制
     Vector(T const* A,Rank lo,Rank hi);//区间复制
     Vector(Vector<T> const& V);//向量整体复制
-    Vector(Vector<T> const& V,Rank lo,Rank hi);//区间
+    Vector(Vector<T> const& V,Rank lo,Rank hi);//区1间
     ~Vector();//释放内部空间
     Rank size() const;//规模
     bool empty() const;//判空
     int disorded() const;//判断向量是否已排序
     Rank find(T const& e) const;//无序向量整体查找
     Rank find(T const& e,Rank lo,Rank hi) const;//无序向量区间查找
+    Rank fibSearch(T* A,T const& e,Rank lo,Rank hi);//Fibonacci查找算法
+    Rank binSearch(T* A,T const& e,Rank lo,Rank hi);//二分查找
     Rank search(T const& e) const;//有序向量整体查找
     Rank search(T const& e,Rank lo,Rank hi);//有序向量区间查找
     T& operator[](Rank r)const;//重载[]符号
