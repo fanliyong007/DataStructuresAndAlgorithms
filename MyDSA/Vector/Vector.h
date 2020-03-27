@@ -26,13 +26,18 @@ protected:
     void swap(T &A,T &B);//交换操作
     Rank max(Rank lo,Rank hi);//选取最大元素
     void selectionSort(Rank lo,Rank hi);//选择排序
-    void merge(Rank lo,Rank hi);//归并算法
+    void merge(Rank lo,Rank mi,Rank hi);//归并算法
     void mergeSort(Rank lo,Rank hi);//归并排序算法
     Rank partition(Rank lo,Rank hi);//轴点构造算法
     void quickSort(Rank lo,Rank hi);//快速排序算法
     void heapSort(Rank lo,Rank hi);//堆排序算法
+    void bubbleSort( Rank lo, Rank hi );
 public:
-    Vector(int c=DEFAULT_CAPACITY,int s=0,T v=0);//容量为c、规模为s、所有元素初始化为v
+    Vector(int c=DEFAULT_CAPACITY,int s=0,T v=0)//容量为c、规模为s、所有元素初始化为v
+    {
+        _elem=new T[this->_capcatity=c];//申请空间
+        for(_size=0;_size<s;_elem[_size++]=v);//对每个元素赋值v
+    }
     Vector(T const* A,Rank n);//数组整体复制
     Vector(T const* A,Rank lo,Rank hi);//区间复制
     Vector(Vector<T> const& V);//向量整体复制
@@ -46,7 +51,7 @@ public:
     Rank fibSearch(T* A,T const& e,Rank lo,Rank hi);//Fibonacci查找算法
     Rank binSearch(T* A,T const& e,Rank lo,Rank hi);//二分查找
     Rank search(T const& e) const;//有序向量整体查找
-    Rank search(T const& e,Rank lo,Rank hi);//有序向量区间查找
+    Rank search(T const& e,Rank lo,Rank hi) const;//有序向量区间查找
     T& operator[](Rank r)const;//重载[]符号
     Vector<T>& operator=(Vector<T> const&);//重载=符号
     T remove(Rank r);//删除秩为r的元素
@@ -61,5 +66,5 @@ public:
     int uniquify();//有序去重
     void traverse(void (*) (T&));//遍历（使用函数指针，只读或局部性修改）
     template <typename VST>void traverse(VST&);//遍历（使用函数对象，可全局性修改）
-}
+};
 #endif

@@ -78,6 +78,4 @@
     "mdmath.macros": {},
     "mdmath.autosave": false,
     "intelliSenseMode": "clang-x64", // 注意修改, 提供智能提示
-    "cmake.cmakePath":"cmake",
-    "cmake.sourceDirectory":"D:\\DataStructuresAndAlgorithms\\MyDSA\\Test\\"
-}
+  }

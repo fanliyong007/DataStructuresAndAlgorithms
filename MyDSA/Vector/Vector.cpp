@@ -2,7 +2,7 @@
 template <typename T>
 void Vector<T>::copyFrom(T const* A,Rank lo,Rank hi)//复制数组区间[lo,hi]
 {
-    _elem=new T[_capcatity=2*(hi-lo)];
+    _elem=new T[this->_capcatity=2*(hi-lo)];
     _size=0;
     while(lo<hi)
     {
@@ -12,10 +12,10 @@ void Vector<T>::copyFrom(T const* A,Rank lo,Rank hi)//复制数组区间[lo,hi]
 template <typename T>
 void Vector<T>::expand()//扩容函数，用于空间不足时使用
 {
-    if(_size<_capcatity)return;//尚未满，不必扩容
-    if(_capcatity<DEFAULT_CAPACITY)_capcatity=DEFAULT_CAPACITY;//不低于最小容量
+    if(_size<this->_capcatity)return;//尚未满，不必扩容
+    if(this->_capcatity<DEFAULT_CAPACITY)this->_capcatity=DEFAULT_CAPACITY;//不低于最小容量
     T *oldElem=_elem;//容量加倍
-    _elem=new T[_capcatity<<=1];
+    _elem=new T[this->_capcatity<<=1];
     for(int i=0;i<_size;i++)
     {
         _elem[i]=oldElem[i];//复制原向量内容
@@ -25,16 +25,16 @@ void Vector<T>::expand()//扩容函数，用于空间不足时使用
 template <typename T>
 void Vector<T>::shrink()//装填因子过小时压缩空间
 {
-    if(_capacity<DEFAULT_CAPACITY<<1)
+    if(this->_capcatity<DEFAULT_CAPACITY<<1)
     {
         return;//不致收缩到DEFAULT_CAPACITY
     }
-    if(_size<<2>_capacity)
+    if(_size<<2>this->_capcatity)
     {
         return;//以25%为界
     }
     T *oldElem=_elem;
-    _elem=new T[_capacity>>=1];//容量减半
+    _elem=new T[this->_capcatity>>=1];//容量减半
     for(int i=0;i<_size;i++)
     {
         _elem[i]=oldElem[i];//复制原向量内容
@@ -67,7 +67,7 @@ void Vector<T>::swap(T &A,T &B)//交换操作
     B=tmp;
 }
 template <typename T>
-void Vector<T>::merge(Rank lo,Rank hi)//归并算法
+void Vector<T>::merge(Rank lo,Rank mi,Rank hi)//归并算法
 {
     T* A=_elem+lo;//合并后的向量A[0,hi-lo)=_elem[lo,hi)
     Rank lb=mi-lo;//前子向量B[0,lb)=_elem[lo,mi]
@@ -109,19 +109,19 @@ void Vector<T>::quickSort(Rank lo,Rank hi){}//快速排序算法
 template <typename T>
 void Vector<T>::heapSort(Rank lo,Rank hi){}//堆排序算法
 //-------------------------------------------------public--------------------------------------------------------
-template <typename T>
-Vector<T>::Vector(int c=DEFAULT_CAPACITY,int s=0,T v=0)//容量为c、规模为s、所有元素初始化为v
-{
-    _elem=new T[_capcatity=c];//申请空间
-    for(_size=0;_size<s;_elem[_size++]=v);//对每个元素赋值v
-}
+// template <typename T>
+// Vector<T>::Vector(int c=DEFAULT_CAPACITY,int s=0,T v=0)//容量为c、规模为s、所有元素初始化为v
+// {
+//     _elem=new T[this->_capcatity=c];//申请空间
+//     for(_size=0;_size<s;_elem[_size++]=v);//对每个元素赋值v
+// }
 template <typename T>
 Vector<T>::Vector(T const* A,Rank n)//数组整体复制
 {
     copyFrom(A,0,n);//数组整体复制
 }
 template <typename T>
-Vector<T>::Vector(T const* A,Rank lo,Rank hi);//区间复制
+Vector<T>::Vector(T const* A,Rank lo,Rank hi)//区间复制
 {
     copyFrom(A,lo,hi);
 }
@@ -135,6 +135,7 @@ Vector<T>::Vector(Vector<T> const& V,Rank lo,Rank hi)//区间
 {
     copyFrom(V._elem,lo,hi);
 }
+template <typename T>
 Vector<T>::~Vector()//释放内部空间
 {
     delete [] _elem;
@@ -207,7 +208,7 @@ T& Vector<T>::operator[](Rank r)const//重载[]符号
     return _elem[r];//assert:0<=r<_size
 }
 template <typename T>
-Vector<T>& Vector<T>::operator=(Vector<T> const&)//重载=符号
+Vector<T>& Vector<T>::operator=(Vector<T> const& V)//重载=符号
 {
     if(_elem)
     {
@@ -232,7 +233,7 @@ int Vector<T>::remove(Rank lo,Rank hi)//删除区间内元素
     return hi-lo;//返回被删除元素的数目
 }
 template <typename T>
-T Vector<T>::remove(Rank r);//删除秩为r的元素
+T Vector<T>::remove(Rank r)//删除秩为r的元素
 {
     T e=_elem[r];//备份删除元素
     remove(r,r+1);//调用区间删除算法等效于对区间删除
@@ -250,7 +251,7 @@ Rank Vector<T>::insert(Rank r,T const& e)//插入元素
     _size++;//插入新元素并更新容量
     return r;//返回秩
 }
-template <typename T>
+template <typename T> 
 Rank Vector<T>::insert(T const& e)//在末尾插入元素
 {
     return insert(_size,e);
@@ -305,15 +306,16 @@ void Vector<T>::traverse(void (*visit) (T&))//遍历（使用函数指针，只�
 {
     for(int i=0;i<_size;i++)
     {
-        visit(_elem[i];)// 遍历向量
+        visit(_elem[i]);// 遍历向量
     }
 }
+template <typename T>
 template <typename VST>
 void Vector<T>::traverse(VST& visit)//遍历（使用函数对象，可全局性修改）
 {
     for(int i=0;i<_size;i++)
     {
-        visit(_elem[i];)// 遍历向量
+        visit(_elem[i]);// 遍历向量
     }
 }
 template <typename T>
